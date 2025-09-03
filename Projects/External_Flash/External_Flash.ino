@@ -2,12 +2,17 @@
 #include <SPIFlash.h>
 #include "time.h"
 #include <WiFi.h>
-#include "time.h"
-#include<Wire.h>
 
+//Flash Pin connection
+//CLK - 18
+//CS - 5
+//DI - 23
+//DO - 19
+//VCC - 3v
+//GND - 0v
 #define ext_flash_cs_u8 5  // cs pin for ext flash
 #define ext_flash_base_addr_u8 0 // ext flash starting addr
-#define ext_flash_size_u16 (2*1024) // ext flash size 
+#define ext_flash_size_u16 (2*1024) // ext flash size  2MB
 
 #define UT_trig_u8 12
 #define UT_echo_u8 13
@@ -40,16 +45,16 @@ void writeReadDataExtFlash(float dist)
   data ="Time: " + String(timestamp) + " Distance: " + String(dist) + " cm";
   data.toCharArray(sndData, sizeof(sndData));
    
-  if (pc_u32 <= ext_flash_base_addr_u8 + ext_flash_size_u16) 
+  if ( (pc_u32 + sizeof(sndData) )<= ext_flash_base_addr_u8 + ext_flash_size_u16) 
   {
-    if(dist> 20.0 && dist <40.0)
+    if(dist> 10.0 && dist <40.0)
     {
       flash.writeBytes(pc_u32, sndData, strlen(sndData)+1);
       flash.readBytes(pc_u32,rcvData, sizeof(rcvData));
       pc_u32+=strlen(sndData)+1;
       Serial.print(" ");
       Serial.println(rcvData);
-      delay(1000);
+     delay(1000);
     }
   }   
   else
